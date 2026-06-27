@@ -1,0 +1,2177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REBOUT | FPV Operations Platform</title>
+<meta name="description" content="REBOUT — Global FPV Operations, RC Racing, Heavy Equipment, Live Events">
+
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+<!-- Google Icons -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+<style>
+/* ============================================
+   REBOUT MASTER STYLES — RWB PATRIOT THEME
+   ============================================ */
+:root {
+  --red: #CC0000;
+  --red-bright: #FF1111;
+  --red-dark: #880000;
+  --white: #FFFFFF;
+  --white-dim: #CCCCCC;
+  --blue: #003399;
+  --blue-bright: #1144FF;
+  --blue-dark: #001166;
+  --black: #000000;
+  --black-soft: #0A0A0A;
+  --black-panel: #111111;
+  --black-card: #1A1A1A;
+  --gold: #FFD700;
+  --green: #00FF44;
+  --orange: #FF6600;
+  --glow-red: 0 0 10px #CC0000, 0 0 20px #CC000066;
+  --glow-blue: 0 0 10px #003399, 0 0 20px #00339966;
+  --glow-white: 0 0 10px #FFFFFF66;
+  --border-red: 1px solid #CC000066;
+  --border-blue: 1px solid #00339966;
+  --border-white: 1px solid #FFFFFF22;
+  --font-main: 'Orbitron', monospace;
+  --font-body: 'Rajdhani', sans-serif;
+  --font-mono: 'Share Tech Mono', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--black);
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: 14px;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* ---- SCROLLBAR ---- */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--black-panel); }
+::-webkit-scrollbar-thumb { background: var(--red); border-radius: 3px; }
+
+/* ============================================
+   TOP COMMAND BAR
+   ============================================ */
+#topbar {
+  background: linear-gradient(90deg, var(--black) 0%, var(--blue-dark) 40%, var(--red-dark) 60%, var(--black) 100%);
+  border-bottom: 2px solid var(--red);
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: var(--glow-red);
+}
+
+#topbar .logo {
+  font-family: var(--font-main);
+  font-size: 28px;
+  font-weight: 900;
+  letter-spacing: 6px;
+  background: linear-gradient(90deg, #FF1111, #FFFFFF, #1144FF);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: none;
+  cursor: pointer;
+}
+
+#topbar .logo span {
+  font-size: 11px;
+  display: block;
+  letter-spacing: 3px;
+  background: linear-gradient(90deg, #FF1111, #FFFFFF, #1144FF);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+#topbar .top-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.top-btn {
+  background: transparent;
+  border: 1px solid var(--white-dim);
+  color: var(--white);
+  padding: 5px 12px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: all 0.2s;
+  text-transform: uppercase;
+}
+
+.top-btn:hover { background: var(--red); border-color: var(--red); box-shadow: var(--glow-red); }
+.top-btn.blue:hover { background: var(--blue); border-color: var(--blue); box-shadow: var(--glow-blue); }
+.top-btn.active { background: var(--red); border-color: var(--red-bright); }
+
+#clock {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--green);
+  letter-spacing: 2px;
+  min-width: 80px;
+}
+
+#status-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green);
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+
+/* ============================================
+   AD BANNER TOP
+   ============================================ */
+#ad-top {
+  background: linear-gradient(90deg, var(--blue-dark), var(--black-panel), var(--red-dark));
+  border-bottom: 1px solid var(--red-dark);
+  padding: 6px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--white-dim);
+}
+
+#ad-top .ad-slot {
+  background: var(--black-card);
+  border: 1px solid var(--gold);
+  padding: 4px 16px;
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  color: var(--gold);
+  font-size: 10px;
+  letter-spacing: 2px;
+}
+
+/* ============================================
+   TICKER TAPE
+   ============================================ */
+#ticker {
+  background: var(--red-dark);
+  border-bottom: 1px solid var(--red);
+  padding: 5px 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+#ticker-inner {
+  display: inline-block;
+  animation: ticker 40s linear infinite;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--white);
+  letter-spacing: 1px;
+}
+
+@keyframes ticker {
+  0% { transform: translateX(100vw); }
+  100% { transform: translateX(-100%); }
+}
+
+/* ============================================
+   MAIN LAYOUT — 3 COLUMNS
+   ============================================ */
+#main-layout {
+  display: grid;
+  grid-template-columns: 220px 1fr 220px;
+  gap: 0;
+  min-height: calc(100vh - 120px);
+}
+
+/* ============================================
+   LEFT PANEL
+   ============================================ */
+#left-panel {
+  background: var(--black-panel);
+  border-right: var(--border-red);
+  padding: 12px 8px;
+  overflow-y: auto;
+  max-height: calc(100vh - 120px);
+}
+
+.panel-title {
+  font-family: var(--font-main);
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--red);
+  text-transform: uppercase;
+  padding: 6px 8px;
+  border-bottom: var(--border-red);
+  margin-bottom: 8px;
+}
+
+.agent-category {
+  margin-bottom: 6px;
+}
+
+.agent-cat-header {
+  background: var(--black-card);
+  border: var(--border-red);
+  border-left: 3px solid var(--red);
+  padding: 7px 10px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--white);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s;
+  text-transform: uppercase;
+}
+
+.agent-cat-header:hover { background: var(--red-dark); border-left-color: var(--red-bright); }
+.agent-cat-header.active { background: var(--red-dark); border-left-color: var(--gold); color: var(--gold); }
+
+.agent-list {
+  display: none;
+  background: var(--black);
+  border: var(--border-red);
+  border-top: none;
+}
+
+.agent-list.open { display: block; }
+
+.agent-item {
+  padding: 6px 14px;
+  font-size: 11px;
+  color: var(--white-dim);
+  cursor: pointer;
+  border-bottom: 1px solid #1A1A1A;
+  transition: all 0.15s;
+  font-family: var(--font-body);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.agent-item:hover { background: var(--blue-dark); color: var(--white); padding-left: 20px; }
+.agent-item .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+.agent-item .dot.red { background: var(--red); }
+.agent-item .dot.yellow { background: var(--gold); }
+
+/* ============================================
+   CENTER PANEL
+   ============================================ */
+#center-panel {
+  background: var(--black-soft);
+  overflow-y: auto;
+  max-height: calc(100vh - 120px);
+}
+
+/* Camera Mosaic */
+#camera-section {
+  padding: 10px;
+  border-bottom: var(--border-red);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.section-title {
+  font-family: var(--font-main);
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--red);
+  text-transform: uppercase;
+}
+
+.view-controls {
+  display: flex;
+  gap: 4px;
+}
+
+.view-btn {
+  background: var(--black-card);
+  border: var(--border-white);
+  color: var(--white-dim);
+  padding: 3px 8px;
+  font-size: 10px;
+  cursor: pointer;
+  border-radius: 2px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  letter-spacing: 1px;
+  transition: all 0.2s;
+}
+
+.view-btn:hover, .view-btn.active { background: var(--red); border-color: var(--red); color: var(--white); }
+
+#camera-mosaic {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px;
+}
+
+.camera-cell {
+  background: var(--black);
+  border: 1px solid #222;
+  aspect-ratio: 16/9;
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.camera-cell:hover { border-color: var(--red); }
+.camera-cell.active { border-color: var(--gold); box-shadow: 0 0 8px var(--gold); }
+.camera-cell.fullscreen { grid-column: 1 / -1; grid-row: 1 / 3; }
+
+.camera-feed {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: repeating-linear-gradient(
+    45deg,
+    #0A0A0A,
+    #0A0A0A 10px,
+    #111 10px,
+    #111 20px
+  );
+}
+
+.camera-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 6px;
+  pointer-events: none;
+}
+
+.cam-label {
+  background: rgba(0,0,0,0.8);
+  border: 1px solid var(--red);
+  padding: 2px 6px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--red);
+  letter-spacing: 1px;
+  align-self: flex-start;
+}
+
+.cam-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.cam-signal {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--green);
+  background: rgba(0,0,0,0.8);
+  padding: 2px 5px;
+}
+
+.cam-fps {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--gold);
+  background: rgba(0,0,0,0.8);
+  padding: 2px 5px;
+}
+
+.no-signal {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #333;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 2px;
+}
+
+/* Command Terminal */
+#command-section {
+  padding: 10px;
+  border-bottom: var(--border-blue);
+}
+
+#terminal {
+  background: var(--black);
+  border: 1px solid #1A3300;
+  padding: 8px;
+  height: 120px;
+  overflow-y: auto;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--green);
+  margin-bottom: 8px;
+  border-radius: 2px;
+}
+
+.terminal-line { margin-bottom: 2px; line-height: 1.4; }
+.terminal-line .ts { color: #446644; margin-right: 6px; }
+.terminal-line .cmd { color: var(--green); }
+.terminal-line .err { color: var(--red); }
+.terminal-line .warn { color: var(--gold); }
+.terminal-line .info { color: var(--blue-bright); }
+
+#command-input-row {
+  display: flex;
+  gap: 6px;
+}
+
+#command-input {
+  flex: 1;
+  background: var(--black);
+  border: 1px solid var(--blue);
+  color: var(--green);
+  padding: 6px 10px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  border-radius: 2px;
+  outline: none;
+}
+
+#command-input:focus { border-color: var(--green); box-shadow: 0 0 6px #00FF4444; }
+
+.cmd-btn {
+  background: var(--blue-dark);
+  border: 1px solid var(--blue);
+  color: var(--white);
+  padding: 6px 12px;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 2px;
+  letter-spacing: 1px;
+  transition: all 0.2s;
+}
+
+.cmd-btn:hover { background: var(--blue); box-shadow: var(--glow-blue); }
+
+/* Quick Commands */
+#quick-commands {
+  padding: 8px 10px;
+  border-bottom: var(--border-red);
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.quick-btn {
+  background: var(--black-card);
+  border: var(--border-white);
+  color: var(--white-dim);
+  padding: 4px 10px;
+  font-size: 10px;
+  font-family: var(--font-body);
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.2s;
+  text-transform: uppercase;
+}
+
+.quick-btn:hover { background: var(--blue-dark); border-color: var(--blue); color: var(--white); }
+.quick-btn.red { border-color: var(--red-dark); }
+.quick-btn.red:hover { background: var(--red-dark); border-color: var(--red); }
+
+/* Telemetry Bar */
+#telemetry-bar {
+  padding: 8px 10px;
+  background: var(--black-panel);
+  border-bottom: var(--border-blue);
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+}
+
+.tele-item {
+  background: var(--black);
+  border: var(--border-blue);
+  padding: 5px 8px;
+  border-radius: 2px;
+  text-align: center;
+}
+
+.tele-label {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  color: var(--blue-bright);
+  letter-spacing: 1px;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.tele-value {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--white);
+  font-weight: bold;
+}
+
+.tele-value.green { color: var(--green); }
+.tele-value.red { color: var(--red); }
+.tele-value.gold { color: var(--gold); }
+
+/* Participant + Chat */
+#social-section {
+  padding: 10px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.social-box {
+  background: var(--black);
+  border: var(--border-white);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.social-box-header {
+  background: var(--black-card);
+  padding: 5px 10px;
+  font-family: var(--font-main);
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--red);
+  border-bottom: var(--border-red);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.social-box-body {
+  padding: 6px;
+  height: 140px;
+  overflow-y: auto;
+}
+
+.participant-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 4px;
+  border-bottom: 1px solid #111;
+  font-size: 11px;
+  color: var(--white-dim);
+}
+
+.participant-item .role-badge {
+  font-size: 8px;
+  padding: 1px 4px;
+  border-radius: 2px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.role-badge.admin { background: var(--gold); color: var(--black); }
+.role-badge.operator { background: var(--red); color: var(--white); }
+.role-badge.camera { background: var(--blue); color: var(--white); }
+.role-badge.spectator { background: #333; color: var(--white-dim); }
+.role-badge.judge { background: var(--orange); color: var(--white); }
+
+.chat-message {
+  padding: 3px 4px;
+  border-bottom: 1px solid #111;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.chat-name { color: var(--red); font-weight: 700; margin-right: 4px; }
+.chat-text { color: var(--white-dim); }
+
+.chat-input-row {
+  display: flex;
+  border-top: var(--border-white);
+}
+
+.chat-input {
+  flex: 1;
+  background: var(--black);
+  border: none;
+  color: var(--white);
+  padding: 5px 8px;
+  font-family: var(--font-body);
+  font-size: 11px;
+  outline: none;
+}
+
+.chat-send {
+  background: var(--red-dark);
+  border: none;
+  color: var(--white);
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 700;
+  transition: background 0.2s;
+}
+
+.chat-send:hover { background: var(--red); }
+
+/* ============================================
+   RIGHT PANEL
+   ============================================ */
+#right-panel {
+  background: var(--black-panel);
+  border-left: var(--border-blue);
+  padding: 12px 8px;
+  overflow-y: auto;
+  max-height: calc(100vh - 120px);
+}
+
+/* Leaderboard */
+.leaderboard-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 6px;
+  border-bottom: 1px solid #1A1A1A;
+  font-size: 11px;
+  transition: background 0.15s;
+  cursor: pointer;
+}
+
+.leaderboard-item:hover { background: var(--blue-dark); }
+
+.lb-rank {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: bold;
+  min-width: 20px;
+  text-align: center;
+}
+
+.lb-rank.gold { color: var(--gold); }
+.lb-rank.silver { color: #AAAAAA; }
+.lb-rank.bronze { color: #CD7F32; }
+
+.lb-name { flex: 1; color: var(--white); font-weight: 600; }
+.lb-score { font-family: var(--font-mono); color: var(--green); font-size: 11px; }
+.lb-vehicle { font-size: 9px; color: var(--white-dim); }
+
+/* Portal Links */
+.portal-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  margin-bottom: 4px;
+  background: var(--black-card);
+  border: var(--border-white);
+  border-left: 3px solid var(--blue);
+  cursor: pointer;
+  transition: all 0.2s;
+  border-radius: 2px;
+}
+
+.portal-link:hover { background: var(--blue-dark); border-left-color: var(--blue-bright); }
+.portal-link .portal-icon { font-size: 16px; }
+.portal-link .portal-text { font-size: 11px; font-weight: 700; letter-spacing: 1px; color: var(--white); text-transform: uppercase; }
+.portal-link .portal-sub { font-size: 9px; color: var(--white-dim); }
+
+/* Emergency Stop */
+#emergency-stop {
+  background: linear-gradient(135deg, var(--red-dark), #440000);
+  border: 2px solid var(--red);
+  padding: 12px;
+  text-align: center;
+  cursor: pointer;
+  margin-bottom: 8px;
+  border-radius: 3px;
+  transition: all 0.2s;
+  animation: emergency-pulse 2s infinite;
+}
+
+#emergency-stop:hover {
+  background: var(--red);
+  box-shadow: var(--glow-red);
+  transform: scale(1.02);
+}
+
+@keyframes emergency-pulse {
+  0%, 100% { box-shadow: 0 0 5px var(--red); }
+  50% { box-shadow: 0 0 20px var(--red), 0 0 40px var(--red-dark); }
+}
+
+#emergency-stop .e-icon { font-size: 24px; display: block; }
+#emergency-stop .e-text { font-family: var(--font-main); font-size: 11px; letter-spacing: 3px; color: var(--white); }
+
+/* Event Info Box */
+.event-info-box {
+  background: var(--black);
+  border: var(--border-gold, 1px solid var(--gold));
+  padding: 8px;
+  margin-bottom: 8px;
+  border-radius: 2px;
+}
+
+.event-name {
+  font-family: var(--font-main);
+  font-size: 11px;
+  color: var(--gold);
+  letter-spacing: 2px;
+  margin-bottom: 4px;
+}
+
+.event-detail {
+  font-size: 10px;
+  color: var(--white-dim);
+  line-height: 1.6;
+  font-family: var(--font-mono);
+}
+
+/* ============================================
+   FOOTER
+   ============================================ */
+#footer {
+  background: var(--black-panel);
+  border-top: 2px solid var(--blue);
+  padding: 10px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10px;
+  color: var(--white-dim);
+  font-family: var(--font-mono);
+}
+
+#footer .footer-logo {
+  font-family: var(--font-main);
+  font-size: 14px;
+  font-weight: 900;
+  background: linear-gradient(90deg, #FF1111, #FFFFFF, #1144FF);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 4px;
+}
+
+#footer .footer-links { display: flex; gap: 16px; }
+#footer .footer-links a { color: var(--white-dim); text-decoration: none; transition: color 0.2s; }
+#footer .footer-links a:hover { color: var(--red); }
+
+/* ============================================
+   MODALS
+   ============================================ */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.92);
+  z-index: 2000;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-overlay.active { display: flex; }
+
+.modal-box {
+  background: var(--black-panel);
+  border: 1px solid var(--red);
+  box-shadow: var(--glow-red);
+  width: 90%;
+  max-width: 600px;
+  max-height: 85vh;
+  overflow-y: auto;
+  border-radius: 4px;
+  animation: modalIn 0.2s ease;
+}
+
+@keyframes modalIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.modal-header {
+  background: linear-gradient(90deg, var(--red-dark), var(--black-card));
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: var(--border-red);
+}
+
+.modal-title {
+  font-family: var(--font-main);
+  font-size: 14px;
+  letter-spacing: 3px;
+  color: var(--white);
+  text-transform: uppercase;
+}
+
+.modal-close {
+  background: none;
+  border: 1px solid var(--white-dim);
+  color: var(--white);
+  width: 28px; height: 28px;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.modal-close:hover { background: var(--red); border-color: var(--red); }
+
+.modal-body { padding: 16px; }
+
+/* Form Styles */
+.form-group { margin-bottom: 14px; }
+.form-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--blue-bright);
+  letter-spacing: 2px;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+}
+
+.form-input, .form-select {
+  width: 100%;
+  background: var(--black);
+  border: 1px solid #333;
+  color: var(--white);
+  padding: 8px 12px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  border-radius: 2px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-input:focus, .form-select:focus { border-color: var(--red); }
+.form-select option { background: var(--black-panel); }
+
+.form-btn {
+  background: var(--red-dark);
+  border: 1px solid var(--red);
+  color: var(--white);
+  padding: 10px 20px;
+  font-family: var(--font-main);
+  font-size: 11px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  border-radius: 2px;
+  width: 100%;
+  transition: all 0.2s;
+  text-transform: uppercase;
+}
+
+.form-btn:hover { background: var(--red); box-shadow: var(--glow-red); }
+.form-btn.blue { background: var(--blue-dark); border-color: var(--blue); }
+.form-btn.blue:hover { background: var(--blue); box-shadow: var(--glow-blue); }
+
+.google-btn {
+  background: var(--white);
+  border: none;
+  color: var(--black);
+  padding: 10px 20px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 3px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.2s;
+  margin-bottom: 10px;
+}
+
+.google-btn:hover { background: #F0F0F0; box-shadow: 0 2px 8px rgba(255,255,255,0.3); }
+
+.divider {
+  text-align: center;
+  color: #444;
+  font-size: 11px;
+  margin: 12px 0;
+  position: relative;
+}
+
+.divider::before, .divider::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 40%;
+  height: 1px;
+  background: #333;
+}
+
+.divider::before { left: 0; }
+.divider::after { right: 0; }
+
+/* Emergency Modal */
+#emergency-modal .modal-box { border-color: var(--red); }
+#emergency-modal .modal-header { background: var(--red-dark); }
+
+.emergency-content {
+  text-align: center;
+  padding: 20px;
+}
+
+.emergency-icon { font-size: 64px; display: block; margin-bottom: 12px; }
+
+.emergency-title {
+  font-family: var(--font-main);
+  font-size: 20px;
+  color: var(--red);
+  letter-spacing: 4px;
+  margin-bottom: 8px;
+}
+
+.emergency-sub {
+  color: var(--white-dim);
+  font-size: 13px;
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+.emergency-confirm-btn {
+  background: var(--red);
+  border: 2px solid var(--red-bright);
+  color: var(--white);
+  padding: 14px 30px;
+  font-family: var(--font-main);
+  font-size: 14px;
+  letter-spacing: 3px;
+  cursor: pointer;
+  border-radius: 3px;
+  width: 100%;
+  box-shadow: var(--glow-red);
+  transition: all 0.2s;
+  margin-bottom: 8px;
+}
+
+.emergency-confirm-btn:hover { background: var(--red-bright); transform: scale(1.02); }
+
+.emergency-cancel-btn {
+  background: transparent;
+  border: 1px solid #444;
+  color: var(--white-dim);
+  padding: 8px 20px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: 2px;
+  width: 100%;
+  transition: all 0.2s;
+}
+
+.emergency-cancel-btn:hover { background: #222; }
+
+/* Protocol Download */
+.protocol-section {
+  margin-bottom: 16px;
+  border: var(--border-blue);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.protocol-section-title {
+  background: var(--blue-dark);
+  padding: 7px 12px;
+  font-family: var(--font-main);
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--white);
+  text-transform: uppercase;
+}
+
+.protocol-section-body {
+  padding: 10px 12px;
+  font-size: 12px;
+  color: var(--white-dim);
+  line-height: 1.7;
+}
+
+.protocol-section-body ul { padding-left: 16px; }
+.protocol-section-body li { margin-bottom: 4px; }
+
+/* Tabs */
+.modal-tabs {
+  display: flex;
+  border-bottom: var(--border-red);
+  margin-bottom: 16px;
+}
+
+.modal-tab {
+  padding: 8px 16px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  color: var(--white-dim);
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  text-transform: uppercase;
+}
+
+.modal-tab:hover { color: var(--white); }
+.modal-tab.active { color: var(--red); border-bottom-color: var(--red); }
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* Grid cards */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.info-card {
+  background: var(--black);
+  border: var(--border-white);
+  padding: 10px;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.info-card:hover { border-color: var(--red); background: var(--black-card); }
+.info-card .card-icon { font-size: 20px; margin-bottom: 4px; }
+.info-card .card-title { font-family: var(--font-main); font-size: 10px; color: var(--white); letter-spacing: 1px; }
+.info-card .card-sub { font-size: 10px; color: var(--white-dim); margin-top: 2px; }
+
+/* ============================================
+   AD BANNER BOTTOM
+   ============================================ */
+#ad-bottom {
+  background: var(--black-panel);
+  border-top: 1px solid var(--blue-dark);
+  padding: 8px 16px;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.ad-banner {
+  background: var(--black-card);
+  border: 1px solid #222;
+  padding: 6px 20px;
+  font-size: 10px;
+  color: var(--white-dim);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font-mono);
+  letter-spacing: 1px;
+}
+
+.ad-banner:hover { border-color: var(--gold); color: var(--gold); }
+.ad-banner.sponsor { border-color: var(--gold); color: var(--gold); }
+
+/* ============================================
+   NOTIFICATION TOAST
+   ============================================ */
+#toast-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 3000;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.toast {
+  background: var(--black-panel);
+  border-left: 3px solid var(--green);
+  padding: 10px 14px;
+  font-size: 12px;
+  color: var(--white);
+  border-radius: 2px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  animation: toastIn 0.3s ease;
+  max-width: 280px;
+  font-family: var(--font-body);
+}
+
+.toast.error { border-left-color: var(--red); }
+.toast.warn { border-left-color: var(--gold); }
+.toast.info { border-left-color: var(--blue-bright); }
+
+@keyframes toastIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 900px) {
+  #main-layout { grid-template-columns: 1fr; }
+  #left-panel, #right-panel { max-height: none; }
+  #camera-mosaic { grid-template-columns: 1fr; }
+  #telemetry-bar { grid-template-columns: repeat(3, 1fr); }
+  #social-section { grid-template-columns: 1fr; }
+  .card-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 600px) {
+  #topbar .logo { font-size: 20px; }
+  #telemetry-bar { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ============================================
+     TOP COMMAND BAR
+     ============================================ -->
+<div id="topbar">
+  <div class="logo" onclick="showModal('event-modal')">
+    REBOUT
+    <span>FPV OPERATIONS PLATFORM</span>
+  </div>
+  <div class="top-controls">
+    <div id="status-dot"></div>
+    <span id="clock">00:00:00</span>
+    <button class="top-btn" onclick="showModal('login-modal')">⚡ LOGIN</button>
+    <button class="top-btn blue" onclick="showModal('register-modal')">📋 REGISTER</button>
+    <button class="top-btn" onclick="showModal('camera-modal')">📷 CAMERAS</button>
+    <button class="top-btn blue" onclick="showModal('chat-modal')">💬 CHAT ROOMS</button>
+    <button class="top-btn" onclick="showModal('protocol-modal')">📥 PROTOCOL</button>
+    <button class="top-btn blue" onclick="showModal('vehicle-modal')">🚗 VEHICLES</button>
+    <button class="top-btn" onclick="showModal('admin-modal')">⚙️ ADMIN</button>
+  </div>
+</div>
+
+<!-- AD BANNER TOP -->
+<div id="ad-top">
+  <div class="ad-slot">[ SPONSOR AD SLOT A — 728×90 ]</div>
+  <div style="font-size:10px; letter-spacing:1px;">POWERED BY REBOUT | EMERGENTPARKZ</div>
+  <div class="ad-slot">[ SPONSOR AD SLOT B — 728×90 ]</div>
+</div>
+
+<!-- TICKER TAPE -->
+<div id="ticker">
+  <div id="ticker-inner">
+    🏁 REBOUT PLATFORM LIVE — GLOBAL FPV OPERATIONS &nbsp;|&nbsp;
+    🚗 RC RACING — ENDURANCE COURSE ACTIVE &nbsp;|&nbsp;
+    📡 CAMERA FEEDS ONLINE — 4 ACTIVE STREAMS &nbsp;|&nbsp;
+    ⚡ NEXT EVENT: JUNKYARD WARS — REGISTER NOW &nbsp;|&nbsp;
+    🏆 LEADERBOARD UPDATED — TOP OPERATOR: GHOST_RIDER &nbsp;|&nbsp;
+    🔴 LIVE: URBAN COMBAT ZONE — SECTOR 7 &nbsp;|&nbsp;
+    🌐 GLOBAL PARTICIPANTS CONNECTED — JOIN THE ACTION &nbsp;|&nbsp;
+    📥 DOWNLOAD SAFETY PROTOCOL — REQUIRED FOR ALL OPERATORS &nbsp;|&nbsp;
+    🎯 PAINTBALL VEHICLES READY — ARENA OPEN &nbsp;|&nbsp;
+    🤖 MECHANIZED TRANSFORMERS — QUALIFYING ROUND 2 &nbsp;|&nbsp;
+  </div>
+</div>
+
+<!-- ============================================
+     MAIN 3-COLUMN LAYOUT
+     ============================================ -->
+<div id="main-layout">
+
+  <!-- LEFT PANEL — AGENT CATEGORIES -->
+  <div id="left-panel">
+    <div class="panel-title">⚡ AGENT CATEGORIES</div>
+
+    <!-- Google Services -->
+    <div class="agent-category">
+      <div class="agent-cat-header active" onclick="toggleCategory(this)">
+        🔵 GOOGLE SERVICES <span>▼</span>
+      </div>
+      <div class="agent-list open">
+        <div class="agent-item" onclick="launchAgent('google-maps')"><div class="dot"></div>Google Maps</div>
+        <div class="agent-item" onclick="launchAgent('google-meet')"><div class="dot"></div>Google Meet</div>
+        <div class="agent-item" onclick="launchAgent('google-drive')"><div class="dot"></div>Google Drive</div>
+        <div class="agent-item" onclick="launchAgent('youtube')"><div class="dot"></div>YouTube Live</div>
+        <div class="agent-item" onclick="launchAgent('google-earth')"><div class="dot"></div>Google Earth</div>
+        <div class="agent-item" onclick="launchAgent('firebase')"><div class="dot"></div>Firebase DB</div>
+      </div>
+    </div>
+
+    <!-- Open Source Tools -->
+    <div class="agent-category">
+      <div class="agent-cat-header" onclick="toggleCategory(this)">
+        🟢 OPEN SOURCE <span>▶</span>
+      </div>
+      <div class="agent-list">
+        <div class="agent-item" onclick="launchAgent('mediamtx')"><div class="dot"></div>MediaMTX Stream</div>
+        <div class="agent-item" onclick="launchAgent('ffmpeg')"><div class="dot"></div>FFmpeg Engine</div>
+        <div class="agent-item" onclick="launchAgent('nodejs')"><div class="dot"></div>Node.js Hub</div>
+        <div class="agent-item" onclick="launchAgent('openlayers')"><div class="dot"></div>OpenLayers Map</div>
+        <div class="agent-item" onclick="launchAgent('mqtt')"><div class="dot"></div>MQTT Broker</div>
+        <div class="agent-item" onclick="launchAgent('grafana')"><div class="dot"></div>Grafana Telemetry</div>
+      </div>
+    </div>
+
+    <!-- FPV Operations -->
+    <div class="agent-category">
+      <div class="agent-cat-header" onclick="toggleCategory(this)">
+        🔴 FPV OPERATIONS <span>▶</span>
+      </div>
+      <div class="agent-list">
+        <div class="agent-item" onclick="launchAgent('fpv-drone')"><div class="dot yellow"></div>FPV Drone Ops</div>
+        <div class="agent-item" onclick="launchAgent('rc-ground')"><div class="dot yellow"></div>RC Ground Fleet</div>
+        <div class="agent-item" onclick="launchAgent('camera-hub')"><div class="dot"></div>Camera Hub</div>
+        <div class="agent-item" onclick="launchAgent('signal-monitor')"><div class="dot"></div>Signal Monitor</div>
+        <div class="agent-item" onclick="launchAgent('frequency-mgr')"><div class="dot yellow"></div>Frequency Manager</div>
+      </div>
+    </div>
+
+    <!-- Race Events -->
+    <div class="agent-category">
+      <div class="agent-cat-header" onclick="toggleCategory(this)">
+        🏁 RACE EVENTS <span>▶</span>
+      </div>
+      <div class="agent-list">
+        <div class="agent-item" onclick="launchAgent('endurance')"><div class="dot"></div>Endurance Course</div>
+        <div class="agent-item" onclick="launchAgent('oval-track')"><div class="dot yellow"></div>Oval Track</div>
+        <div class="agent-item" onclick="launchAgent('urban-zone')"><div class="dot red"></div>Urban Zone</div>
+        <div class="agent-item" onclick="launchAgent('junkyard')"><div class="dot red"></div>Junkyard Wars</div>
+        <div class="agent-item" onclick="launchAgent('multi-terrain')"><div class="dot"></div>Multi-Terrain</div>
+      </div>
+    </div>
+
+    <!-- Heavy Equipment -->
+    <div class="agent-category">
+      <div class="agent-cat-header" onclick="toggleCategory(this)">
+        🏗️ HEAVY EQUIPMENT <span>▶</span>
+      </div>
+      <div class="agent-list">
+        <div class="agent-item" onclick="launchAgent('excavator')"><div class="dot yellow"></div>Excavator Ops</div>
+        <div class="agent-item" onclick="launchAgent('crane')"><div class="dot"></div>Crane Control</div>
+        <div class="agent-item" onclick="launchAgent('bulldozer')"><div class="dot"></div>Bulldozer Fleet</div>
+        <div class="agent-item" onclick="launchAgent('forklift')"><div class="dot yellow"></div>Forklift Grid</div>
+      </div>
+    </div>
+
+    <!-- Streaming -->
+    <div class="agent-category">
+      <div class="agent-cat-header" onclick="toggleCategory(this)">
+        📡 STREAMING <span>▶</span>
+      </div>
+      <div class="agent-list">
+        <div class="agent-item" onclick="launchAgent('youtube-stream')"><div class="dot red"></div>YouTube Live</div>
+        <div class="agent-item" onclick="launchAgent('twitch')"><div class="dot red"></div>Twitch Stream</div>
+        <div class="agent-item" onclick="launchAgent('rtmp-server')"><div class="dot"></div>RTMP Server</div>
+        <div class="agent-item" onclick="launchAgent('hls-output')"><div class="dot"></div>HLS Output</div>
+        <div class="agent-item" onclick="launchAgent('obs-relay')"><div class="dot yellow"></div>OBS Relay</div>
+      </div>
+    </div>
+
+    <!-- Safety -->
+    <div class="agent-category">
+      <div class="agent-cat-header" onclick="toggleCategory(this)">
+        🛡️ SAFETY SYSTEMS <span>▶</span>
+      </div>
+      <div class="agent-list">
+        <div class="agent-item" onclick="showModal('emergency-modal')"><div class="dot red"></div>Emergency Stop</div>
+        <div class="agent-item" onclick="launchAgent('personnel-alert')"><div class="dot yellow"></div>Personnel Alert</div>
+        <div class="agent-item" onclick="launchAgent('signal-loss')"><div class="dot"></div>Signal Loss Detect</div>
+        <div class="agent-item" onclick="launchAgent('geo-fence')"><div class="dot"></div>Geo-Fence Monitor</div>
+        <div class="agent-item" onclick="showModal('protocol-modal')"><div class="dot yellow"></div>Safety Protocol</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CENTER PANEL -->
+  <div id="center-panel">
+
+    <!-- CAMERA MOSAIC -->
+    <div id="camera-section">
+      <div class="section-header">
+        <div class="section-title">📷 LIVE CAMERA FEEDS</div>
+        <div class="view-controls">
+          <button class="view-btn active" onclick="setView('quad')">QUAD</button>
+          <button class="view-btn" onclick="setView('single')">SINGLE</button>
+          <button class="view-btn" onclick="setView('pip')">PIP</button>
+          <button class="view-btn" onclick="setView('full')">FULL</button>
+        </div>
+      </div>
+
+      <div id="camera-mosaic">
+        <!-- Camera 1 -->
+        <div class="camera-cell active" id="cam-1" onclick="selectCamera(1)">
+          <div class="camera-feed"></div>
+          <div class="camera-overlay">
+            <div class="cam-label">📷 CAM-01 | FPV DRONE</div>
+            <div class="cam-status">
+              <div class="cam-signal">▶ LIVE</div>
+              <div class="cam-fps">30fps</div>
+            </div>
+          </div>
+        </div>
+        <!-- Camera 2 -->
+        <div class="camera-cell" id="cam-2" onclick="selectCamera(2)">
+          <div class="camera-feed"></div>
+          <div class="camera-overlay">
+            <div class="cam-label">📷 CAM-02 | RC GROUND</div>
+            <div class="cam-status">
+              <div class="cam-signal">▶ LIVE</div>
+              <div class="cam-fps">25fps</div>
+            </div>
+          </div>
+        </div>
+        <!-- Camera 3 -->
+        <div class="camera-cell" id="cam-3" onclick="selectCamera(3)">
+          <div class="camera-feed" style="background: repeating-linear-gradient(0deg, #0A0A0A, #0A0A0A 2px, #111 2px, #111 4px);"></div>
+          <div class="camera-overlay">
+            <div class="cam-label">📷 CAM-03 | OVERHEAD</div>
+            <div class="cam-status">
+              <div class="cam-signal" style="color:var(--gold);">⚠ WEAK</div>
+              <div class="cam-fps">15fps</div>
+            </div>
+          </div>
+        </div>
+        <!-- Camera 4 -->
+        <div class="camera-cell" id="cam-4" onclick="selectCamera(4)">
+          <div class="no-signal">◼ NO SIGNAL<br>CAM-04</div>
+          <div class="camera-overlay">
+            <div class="cam-label" style="color:#555;">📷 CAM-04 | RESERVE</div>
+            <div class="cam-status">
+              <div class="cam-signal" style="color:#555;">◼ OFFLINE</div>
+              <div class="cam-fps" style="color:#555;">--fps</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TELEMETRY BAR -->
+    <div id="telemetry-bar">
+      <div class="tele-item">
+        <span class="tele-label">SPEED</span>
+        <span class="tele-value green" id="t-speed">24.3</span>
+      </div>
+      <div class="tele-item">
+        <span class="tele-label">BATTERY</span>
+        <span class="tele-value gold" id="t-battery">78%</span>
+      </div>
+      <div class="tele-item">
+        <span class="tele-label">SIGNAL</span>
+        <span class="tele-value green" id="t-signal">-62dB</span>
+      </div>
+      <div class="tele-item">
+        <span class="tele-label">LATENCY</span>
+        <span class="tele-value" id="t-latency">42ms</span>
+      </div>
+      <div class="tele-item">
+        <span class="tele-label">ALTITUDE</span>
+        <span class="tele-value" id="t-altitude">12.4m</span>
+      </div>
+    </div>
+
+    <!-- QUICK COMMANDS -->
+    <div id="quick-commands">
+      <button class="quick-btn" onclick="sendCmd('ARM')">⚡ ARM</button>
+      <button class="quick-btn" onclick="sendCmd('DISARM')">🔒 DISARM</button>
+      <button class="quick-btn" onclick="sendCmd('HOLD')">⏸ HOLD</button>
+      <button class="quick-btn" onclick="sendCmd('RTH')">🏠 RTH</button>
+      <button class="quick-btn" onclick="sendCmd('LAUNCH')">🚀 LAUNCH</button>
+      <button class="quick-btn" onclick="sendCmd('LAND')">⬇ LAND</button>
+      <button class="quick-btn" onclick="sendCmd('CAM_SWITCH')">📷 CAM SW</button>
+      <button class="quick-btn" onclick="sendCmd('RECORD')">⏺ RECORD</button>
+      <button class="quick-btn red" onclick="showModal('emergency-modal')">🛑 E-STOP</button>
+    </div>
+
+    <!-- COMMAND TERMINAL -->
+    <div id="command-section">
+      <div class="section-header" style="margin-bottom:6px;">
+        <div class="section-title">⌨️ COMMAND TERMINAL</div>
+        <button class="view-btn" onclick="clearTerminal()">CLEAR</button>
+      </div>
+      <div id="terminal">
+        <div class="terminal-line"><span class="ts">[00:00:01]</span><span class="info">REBOUT PLATFORM INITIALIZED</span></div>
+        <div class="terminal-line"><span class="ts">[00:00:02]</span><span class="cmd">SYSTEM: Firebase connected</span></div>
+        <div class="terminal-line"><span class="ts">[00:00:03]</span><span class="cmd">CAMERAS: 3/4 streams active</span></div>
+        <div class="terminal-line"><span class="ts">[00:00:04]</span><span class="warn">WARNING: CAM-04 signal lost</span></div>
+        <div class="terminal-line"><span class="ts">[00:00:05]</span><span class="cmd">TELEMETRY: Bluetooth connected</span></div>
+        <div class="terminal-line"><span class="ts">[00:00:06]</span><span class="info">READY: Awaiting operator commands</span></div>
+      </div>
+      <div id="command-input-row">
+        <input type="text" id="command-input" placeholder="Enter command... (try: HELP, STATUS, LIST)" onkeydown="cmdKeydown(event)">
+        <button class="cmd-btn" onclick="executeCommand()">SEND</button>
+        <button class="cmd-btn" onclick="sendCmd('STATUS')" style="background:var(--blue-dark); border-color:var(--blue);">STATUS</button>
+      </div>
+    </div>
+
+    <!-- PARTICIPANTS + CHAT -->
+    <div id="social-section">
+      <!-- Participants -->
+      <div class="social-box">
+        <div class="social-box-header">
+          👥 PARTICIPANTS
+          <span id="participant-count" style="color:var(--green); font-family:var(--font-mono);">7/10</span>
+        </div>
+        <div class="social-box-body" id="participant-list">
+          <div class="participant-item">
+            <div class="dot" style="width:6px;height:6px;border-radius:50%;background:var(--green);"></div>
+            <span style="flex:1;">GHOST_RIDER</span>
+            <span class="role-badge admin">ADMIN</span>
+          </div>
+          <div class="participant-item">
+            <div class="dot" style="width:6px;height:6px;border-radius:50%;background:var(--green);"></div>
+            <span style="flex:1;">VIPER_FPV</span>
+            <span class="role-badge operator">OPS</span>
+          </div>
+          <div class="participant-item">
+            <div class="dot" style="width:6px;height:6px;border-radius:50%;background:var(--green);"></div>
+            <span style="flex:1;">CAM_HAWK</span>
+            <span class="role-badge camera">CAM</span>
+          </div>
+          <div class="participant-item">
+            <div class="dot" style="width:6px;height:6px;border-radius:50%;background:var(--green);"></div>
+            <span style="flex:1;">JUDGE_X</span>
+            <span class="role-badge judge">JUDGE</span>
+          </div>
+          <div class="participant-item">
+            <div class="dot" style="width:6px;height:6px;border-radius:50%;background:var(--gold);"></div>
+            <span style="flex:1;">SPEED_DEMON</span>
+            <span class="role-badge spectator">SPEC</span>
+          </div>
+          <div class="participant-item">
+            <div class="dot" style="width:6px;height:6px;border-radius:50%;background:var(--green);"></div>
+            <span style="flex:1;">IRON_CLAW</span>
+            <span class="role-badge operator">OPS</span>
+          </div>
+          <div class="participant-item">
+            <div class="dot" style="width:6px;height:6px;border-radius:50%;background:var(--red);"></div>
+            <span style="flex:1;">DUST_DEVIL</span>
+            <span class="role-badge spectator">SPEC</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat -->
+      <div class="social-box">
+        <div class="social-box-header">
+          💬 LIVE CHAT
+          <span style="color:var(--green); font-family:var(--font-mono); font-size:9px;">ROOM: OPS-MAIN</span>
+        </div>
+        <div class="social-box-body" id="chat-messages">
+          <div class="chat-message"><span class="chat-name">GHOST_RIDER:</span><span class="chat-text">Platform is live. All operators check in.</span></div>
+          <div class="chat-message"><span class="chat-name">VIPER_FPV:</span><span class="chat-text">CAM-01 confirmed, drone ready on pad.</span></div>
+          <div class="chat-message"><span class="chat-name">CAM_HAWK:</span><span class="chat-text">CAM-02 and 03 streaming. 04 offline.</span></div>
+          <div class="chat-message"><span class="chat-name">JUDGE_X:</span><span class="chat-text">Race start in T-minus 10 minutes.</span></div>
+          <div class="chat-message"><span class="chat-name">IRON_CLAW:</span><span class="chat-text">Heavy equipment standing by sector 3.</span></div>
+        </div>
+        <div class="chat-input-row">
+          <input type="text" class="chat-input" id="chat-input" placeholder="Type message..." onkeydown="chatKeydown(event)">
+          <button class="chat-send" onclick="sendChat()">SEND</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div id="right-panel">
+
+    <!-- Emergency Stop -->
+    <div id="emergency-stop" onclick="showModal('emergency-modal')">
+      <span class="e-icon">🛑</span>
+      <div class="e-text">EMERGENCY STOP</div>
+    </div>
+
+    <!-- Event Info -->
+    <div class="panel-title">🏁 ACTIVE EVENT</div>
+    <div class="event-info-box">
+      <div class="event-name">JUNKYARD WARS — S01E01</div>
+      <div class="event-detail">
+        📍 Sector 7 — Urban Zone<br>
+        ⏱ Duration: 45 min<br>
+        👥 Operators: 6 active<br>
+        🏆 Prize: $500 + Trophy<br>
+        📡 Live on YouTube + Twitch<br>
+        🔴 Status: QUALIFYING
+      </div>
+    </div>
+
+    <!-- Leaderboard -->
+    <div class="panel-title">🏆 LEADERBOARD</div>
+    <div id="leaderboard">
+      <div class="leaderboard-item">
+        <div class="lb-rank gold">1</div>
+        <div>
+          <div class="lb-name">GHOST_RIDER</div>
+          <div class="lb-vehicle">FPV Drone | 1/6 RC</div>
+        </div>
+        <div class="lb-score">9,840</div>
+      </div>
+      <div class="leaderboard-item">
+        <div class="lb-rank silver">2</div>
+        <div>
+          <div class="lb-name">VIPER_FPV</div>
+          <div class="lb-vehicle">FPV Drone</div>
+        </div>
+        <div class="lb-score">8,210</div>
+      </div>
+      <div class="leaderboard-item">
+        <div class="lb-rank bronze">3</div>
+        <div>
+          <div class="lb-name">IRON_CLAW</div>
+          <div class="lb-vehicle">RC Excavator</div>
+        </div>
+        <div class="lb-score">7,650</div>
+      </div>
+      <div class="leaderboard-item">
+        <div class="lb-rank" style="color:var(--white-dim);">4</div>
+        <div>
+          <div class="lb-name">DUST_DEVIL</div>
+          <div class="lb-vehicle">1/10 RC Car</div>
+        </div>
+        <div class="lb-score">6,120</div>
+      </div>
+      <div class="leaderboard-item">
+        <div class="lb-rank" style="color:var(--white-dim);">5</div>
+        <div>
+          <div class="lb-name">SPEED_DEMON</div>
+          <div class="lb-vehicle">1/24 RC Racer</div>
+        </div>
+        <div class="lb-score">5,880</div>
+      </div>
+    </div>
+
+    <div style="height:12px;"></div>
+
+    <!-- Portal Links -->
+    <div class="panel-title">🚪 PORTALS</div>
+    <div class="portal-link" onclick="showModal('camera-modal')">
+      <span class="portal-icon">📷</span>
+      <div>
+        <div class="portal-text">Camera Portal</div>
+        <div class="portal-sub">Add / manage streams</div>
+      </div>
+    </div>
+    <div class="portal-link" onclick="showModal('chat-modal')">
+      <span class="portal-icon">💬</span>
+      <div>
+        <div class="portal-text">Chat Rooms</div>
+        <div class="portal-sub">Join / create rooms</div>
+      </div>
+    </div>
+    <div class="portal-link" onclick="showModal('protocol-modal')">
+      <span class="portal-icon">📥</span>
+      <div>
+        <div class="portal-text">Control Protocol</div>
+        <div class="portal-sub">Download safety docs</div>
+      </div>
+    </div>
+    <div class="portal-link" onclick="showModal('event-modal')">
+      <span class="portal-icon">🏁</span>
+      <div>
+        <div class="portal-text">Event Info</div>
+        <div class="portal-sub">Schedule / results</div>
+      </div>
+    </div>
+    <div class="portal-link" onclick="showModal('vehicle-modal')">
+      <span class="portal-icon">🚗</span>
+      <div>
+        <div class="portal-text">Vehicle Registry</div>
+        <div class="portal-sub">Register your build</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- AD BANNER BOTTOM -->
+<div id="ad-bottom">
+  <div class="ad-banner sponsor">🏆 SPONSOR YOUR TEAM — rebout.io/sponsor</div>
+  <div class="ad-banner">📡 STREAM YOUR EVENT — rebout.io/stream</div>
+  <div class="ad-banner">🚗 REGISTER VEHICLE — rebout.io/vehicles</div>
+  <div class="ad-banner sponsor">⚡ GO PRO — CLOUD ACCESS — rebout.io/pro</div>
+  <div class="ad-banner">🌐 GLOBAL EVENTS — rebout.io/events</div>
+</div>
+
+<!-- FOOTER -->
+<div id="footer">
+  <div class="footer-logo">REBOUT</div>
+  <div style="font-size:9px; letter-spacing:2px; color:#444;">
+    FPV OPERATIONS PLATFORM | EMERGENTPARKZ © 2026
+  </div>
+  <div class="footer-links">
+    <a href="#">TERMS</a>
+    <a href="#">PRIVACY</a>
+    <a href="#">SAFETY</a>
+    <a href="#">CONTACT</a>
+    <a href="#">API</a>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div id="toast-container"></div>
+
+<!-- ============================================
+     MODALS
+     ============================================ -->
+
+<!-- LOGIN MODAL -->
+<div class="modal-overlay" id="login-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">⚡ OPERATOR LOGIN</div>
+      <button class="modal-close" onclick="closeModal('login-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <button class="google-btn" onclick="googleLogin()">
+        <svg width="18" height="18" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+        </svg>
+        Continue with Google
+      </button>
+      <div class="divider">— OR —</div>
+      <div class="form-group">
+        <label class="form-label">CALLSIGN / EMAIL</label>
+        <input type="text" class="form-input" placeholder="Enter callsign or email">
+      </div>
+      <div class="form-group">
+        <label class="form-label">PASSWORD</label>
+        <input type="password" class="form-input" placeholder="Enter password">
+      </div>
+      <button class="form-btn" onclick="emailLogin()">⚡ LOGIN TO PLATFORM</button>
+      <div style="text-align:center; margin-top:10px; font-size:11px; color:#666;">
+        No account? <span style="color:var(--red); cursor:pointer;" onclick="closeModal('login-modal'); showModal('register-modal');">REGISTER HERE</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- REGISTER MODAL -->
+<div class="modal-overlay" id="register-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">📋 OPERATOR REGISTRATION</div>
+      <button class="modal-close" onclick="closeModal('register-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <button class="google-btn" onclick="googleLogin()">
+        <svg width="18" height="18" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+        </svg>
+        Register with Google
+      </button>
+      <div class="divider">— OR MANUAL REGISTRATION —</div>
+      <div class="form-group">
+        <label class="form-label">CALLSIGN</label>
+        <input type="text" class="form-input" placeholder="Your operator callsign (e.g. GHOST_RIDER)">
+      </div>
+      <div class="form-group">
+        <label class="form-label">EMAIL</label>
+        <input type="email" class="form-input" placeholder="your@email.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">ROLE</label>
+        <select class="form-select">
+          <option>Operator</option>
+          <option>Camera Provider</option>
+          <option>Spectator</option>
+          <option>Judge</option>
+          <option>Event Organizer</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">PASSWORD</label>
+        <input type="password" class="form-input" placeholder="Create strong password">
+      </div>
+      <div class="form-group">
+        <label class="form-label">SESSION REGISTRY FEE</label>
+        <select class="form-select">
+          <option>Day Pass — $9.99</option>
+          <option>Week Pass — $24.99</option>
+          <option>Monthly — $49.99</option>
+          <option>Annual Pro — $199.99</option>
+        </select>
+      </div>
+      <button class="form-btn" onclick="registerUser()">📋 CREATE OPERATOR ACCOUNT</button>
+    </div>
+  </div>
+</div>
+
+<!-- EMERGENCY MODAL -->
+<div class="modal-overlay" id="emergency-modal">
+  <div class="modal-box" style="border-color:var(--red); max-width:400px;">
+    <div class="modal-header" style="background:var(--red-dark);">
+      <div class="modal-title">🛑 EMERGENCY STOP</div>
+      <button class="modal-close" onclick="closeModal('emergency-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="emergency-content">
+        <span class="emergency-icon">🛑</span>
+        <div class="emergency-title">ALL STOP</div>
+        <div class="emergency-sub">
+          This will immediately halt ALL vehicles,<br>
+          drones, and heavy equipment in the field.<br>
+          <strong>This action cannot be undone remotely.</strong>
+        </div>
+        <button class="emergency-confirm-btn" onclick="executeEmergencyStop()">
+          🛑 CONFIRM EMERGENCY STOP
+        </button>
+        <button class="emergency-cancel-btn" onclick="closeModal('emergency-modal')">
+          Cancel — Return to Operations
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PROTOCOL MODAL -->
+<div class="modal-overlay" id="protocol-modal">
+  <div class="modal-box" style="max-width:650px;">
+    <div class="modal-header">
+      <div class="modal-title">📥 REBOUT SAFETY PROTOCOL</div>
+      <button class="modal-close" onclick="closeModal('protocol-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="protocol-section">
+        <div class="protocol-section-title">⚡ OPERATOR REQUIREMENTS</div>
+        <div class="protocol-section-body">
+          <ul>
+            <li>All operators must complete online safety certification</li>
+            <li>Valid ID and registration required for all events</li>
+            <li>Emergency stop familiarity test mandatory before field access</li>
+            <li>Minimum age: 16 (under 18 requires guardian consent)</li>
+          </ul>
+        </div>
+      </div>
+      <div class="protocol-section">
+        <div class="protocol-section-title">📡 FREQUENCY MANAGEMENT</div>
+        <div class="protocol-section-body">
+          <ul>
+            <li>All RC frequencies must be registered with the hub before operation</li>
+            <li>2.4GHz / 5.8GHz bands — no unauthorized transmitters</li>
+            <li>FPV video: 5.8GHz only in designated zones</li>
+            <li>Bluetooth telemetry: Class 2 devices only</li>
+          </ul>
+        </div>
+      </div>
+      <div class="protocol-section">
+        <div class="protocol-section-title">🛡️ SAFETY ZONES</div>
+        <div class="protocol-section-body">
+          <ul>
+            <li>Red Zone: Active vehicle operation — no foot traffic</li>
+            <li>Yellow Zone: Transition area — authorized personnel only</li>
+            <li>Green Zone: Spectator and pit area — public access</li>
+            <li>All zones monitored by camera and personnel</li>
+          </ul>
+        </div>
+      </div>
+      <div class="protocol-section">
+        <div class="protocol-section-title">🚗 VEHICLE STANDARDS</div>
+        <div class="protocol-section-body">
+          <ul>
+            <li>All vehicles must pass pre-event inspection</li>
+            <li>Failsafe / emergency stop required on all builds</li>
+            <li>Paintball vehicles: barrel plugs when not in active zone</li>
+            <li>Heavy equipment: certified operator license required</li>
+          </ul>
+        </div>
+      </div>
+      <button class="form-btn" onclick="downloadProtocol()">📥 DOWNLOAD FULL PROTOCOL PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- CAMERA MODAL -->
+<div class="modal-overlay" id="camera-modal">
+  <div class="modal-box" style="max-width:580px;">
+    <div class="modal-header">
+      <div class="modal-title">📷 CAMERA PORTAL</div>
+      <button class="modal-close" onclick="closeModal('camera-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-tabs">
+        <div class="modal-tab active" onclick="switchTab(this, 'tab-active-cams')">ACTIVE FEEDS</div>
+        <div class="modal-tab" onclick="switchTab(this, 'tab-add-cam')">ADD CAMERA</div>
+        <div class="modal-tab" onclick="switchTab(this, 'tab-cam-settings')">SETTINGS</div>
+      </div>
+      <div id="tab-active-cams" class="tab-content active">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+          <div class="info-card">
+            <div class="card-icon">📷</div>
+            <div class="card-title">CAM-01 — FPV DRONE</div>
+            <div class="card-sub">rtsp://192.168.1.100:8554/cam1<br>Status: 🟢 LIVE | 30fps</div>
+          </div>
+          <div class="info-card">
+            <div class="card-icon">📷</div>
+            <div class="card-title">CAM-02 — RC GROUND</div>
+            <div class="card-sub">rtsp://192.168.1.101:8554/cam2<br>Status: 🟢 LIVE | 25fps</div>
+          </div>
+          <div class="info-card">
+            <div class="card-icon">📷</div>
+            <div class="card-title">CAM-03 — OVERHEAD</div>
+            <div class="card-sub">rtsp://192.168.1.102:8554/cam3<br>Status: 🟡 WEAK | 15fps</div>
+          </div>
+          <div class="info-card" style="border-color:#333; opacity:0.5;">
+            <div class="card-icon">📷</div>
+            <div class="card-title">CAM-04 — RESERVE</div>
+            <div class="card-sub">Not connected<br>Status: 🔴 OFFLINE</div>
+          </div>
+        </div>
+      </div>
+      <div id="tab-add-cam" class="tab-content">
+        <div class="form-group">
+          <label class="form-label">CAMERA NAME</label>
+          <input type="text" class="form-input" placeholder="e.g. CAM-05 — CHASE CAM">
+        </div>
+        <div class="form-group">
+          <label class="form-label">STREAM URL (RTSP/HLS/RTMP)</label>
+          <input type="text" class="form-input" placeholder="rtsp://192.168.1.x:8554/stream">
+        </div>
+        <div class="form-group">
+          <label class="form-label">CAMERA TYPE</label>
+          <select class="form-select">
+            <option>FPV Drone Camera</option>
+            <option>RC Ground Vehicle</option>
+            <option>Fixed Overhead</option>
+            <option>Chase Camera</option>
+            <option>Pit Camera</option>
+            <option>Spectator View</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">HARDWARE</label>
+          <select class="form-select">
+            <option>Raspberry Pi + USB Capture</option>
+            <option>ESP32-CAM</option>
+            <option>IP Camera Direct</option>
+            <option>OBS Virtual Camera</option>
+            <option>Phone Stream</option>
+          </select>
+        </div>
+        <button class="form-btn blue" onclick="addCamera()">📷 ADD CAMERA FEED</button>
+      </div>
+      <div id="tab-cam-settings" class="tab-content">
+        <div class="form-group">
+          <label class="form-label">DEFAULT VIEW MODE</label>
+          <select class="form-select">
+            <option>Quad View (2x2)</option>
+            <option>Single Full</option>
+            <option>Picture in Picture</option>
+            <option>Full Screen</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">STREAM QUALITY</label>
+          <select class="form-select">
+            <option>Auto (Adaptive)</option>
+            <option>High — 1080p 30fps</option>
+            <option>Medium — 720p 30fps</option>
+            <option>Low — 480p 15fps</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">SIGNAL LOSS ACTION</label>
+          <select class="form-select">
+            <option>Show No Signal Screen</option>
+            <option>Auto-reconnect (30s)</option>
+            <option>Switch to Backup Feed</option>
+            <option>Trigger Emergency Stop</option>
+          </select>
+        </div>
+        <button class="form-btn" onclick="saveCamSettings()">💾 SAVE SETTINGS</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHAT ROOMS MODAL -->
+<div class="modal-overlay" id="chat-modal">
+  <div class="modal-box" style="max-width:500px;">
+    <div class="modal-header">
+      <div class="modal-title">💬 CHAT ROOMS</div>
+      <button class="modal-close" onclick="closeModal('chat-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="margin-bottom:12px; font-size:11px; color:var(--white-dim); font-family:var(--font-mono);">
+        Max 10 participants per room | Login required to join
+      </div>
+      <div class="card-grid">
+        <div class="info-card" onclick="joinRoom('OPS-MAIN')">
+          <div class="card-icon">⚡</div>
+          <div class="card-title">OPS-MAIN</div>
+          <div class="card-sub">7/10 participants<br>🟢 Active</div>
+        </div>
+        <div class="info-card" onclick="joinRoom('FPV-RACING')">
+          <div class="card-icon">🏁</div>
+          <div class="card-title">FPV-RACING</div>
+          <div class="card-sub">4/10 participants<br>🟢 Active</div>
+        </div>
+        <div class="info-card" onclick="joinRoom('HEAVY-EQ')">
+          <div class="card-icon">🏗️</div>
+          <div class="card-title">HEAVY-EQ</div>
+          <div class="card-sub">2/10 participants<br>🟢 Active</div>
+        </div>
+        <div class="info-card" onclick="joinRoom('JUNKYARD')">
+          <div class="card-icon">🔧</div>
+          <div class="card-title">JUNKYARD</div>
+          <div class="card-sub">5/10 participants<br>🟢 Active</div>
+        </div>
+        <div class="info-card" onclick="joinRoom('SPECTATORS')">
+          <div class="card-icon">👁️</div>
+          <div class="card-title">SPECTATORS</div>
+          <div class="card-sub">9/10 participants<br>🟡 Almost Full</div>
+        </div>
+        <div class="info-card" onclick="joinRoom('ADMIN')">
+          <div class="card-icon">⚙️</div>
+          <div class="card-title">ADMIN</div>
+          <div class="card-sub">3/10 participants<br>🔒 Restricted</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">CREATE NEW ROOM</label>
+        <input type="text" class="form-input" placeholder="Room name..." id="new-room-name">
+      </div>
+      <button class="form-btn blue" onclick="createRoom()">💬 CREATE ROOM</button>
+    </div>
+  </div>
+</div>
+
+<!-- VEHICLE MODAL -->
+<div class="modal-overlay" id="vehicle-modal">
+  <div class="modal-box" style="max-width:600px;">
+    <div class="modal-header">
+      <div class="modal-title">🚗 VEHICLE REGISTRY</div>
+      <button class="modal-close" onclick="closeModal('vehicle-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-tabs">
+        <div class="modal-tab active" onclick="switchTab(this, 'tab-my-vehicles')">MY VEHICLES</div>
+        <div class="modal-tab" onclick="switchTab(this, 'tab-add-vehicle')">REGISTER NEW</div>
+        <div class="modal-tab" onclick="switchTab(this, 'tab-all-vehicles')">ALL REGISTERED</div>
+      </div>
+      <div id="tab-my-vehicles" class="tab-content active">
+        <div class="card-grid">
+          <div class="info-card">
+            <div class="card-icon">🚁</div>
+            <div class="card-title">GHOST-1</div>
+            <div class="card-sub">FPV Drone | 5" Quad<br>🟢 Registered</div>
+          </div>
+          <div class="info-card">
+            <div class="card-icon">🚗</div>
+            <div class="card-title">VIPER-X</div>
+            <div class="card-sub">1/10 RC Car | Traxxas<br>🟢 Registered</div>
+          </div>
+        </div>
+      </div>
+      <div id="tab-add-vehicle" class="tab-content">
+        <div class="form-group">
+          <label class="form-label">VEHICLE NAME / CALLSIGN</label>
+          <input type="text" class="form-input" placeholder="e.g. GHOST-1, IRON-CLAW-3">
+        </div>
+        <div class="form-group">
+          <label class="form-label">VEHICLE CATEGORY</label>
+          <select class="form-select">
+            <option>FPV Drone</option>
+            <option>RC Ground — 1/24 Scale</option>
+            <option>RC Ground — 1/10 Scale</option>
+            <option>RC Ground — 1/6 Scale</option>
+            <option>RC Motorcycle</option>
+            <option>RC Race Car</option>
+            <option>RC Construction Equipment</option>
+            <option>Mechanized Transformer</option>
+            <option>Paintball Vehicle</option>
+            <option>Custom Build</option>
+            <option>Heavy Equipment (Full Size)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">MANUFACTURER / MAKE</label>
+          <input type="text" class="form-input" placeholder="e.g. Traxxas, DJI, Custom">
+        </div>
+        <div class="form-group">
+          <label class="form-label">FREQUENCY / PROTOCOL</label>
+          <select class="form-select">
+            <option>2.4GHz FHSS</option>
+            <option>2.4GHz DSM2/DSMX</option>
+            <option>5.8GHz FPV Video</option>
+            <option>Wi-Fi 2.4GHz</option>
+            <option>Wi-Fi 5GHz</option>
+            <option>Bluetooth</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">CAMERA EQUIPPED</label>
+          <select class="form-select">
+            <option>Yes — Analog FPV</option>
+            <option>Yes — Digital FPV</option>
+            <option>Yes — IP Camera</option>
+            <option>No Camera</option>
+          </select>
+        </div>
+        <button class="form-btn" onclick="registerVehicle()">🚗 REGISTER VEHICLE</button>
+      </div>
+      <div id="tab-all-vehicles" class="tab-content">
+        <div style="font-family:var(--font-mono); font-size:11px; color:var(--white-dim); line-height:2;">
+          🚁 GHOST-1 — FPV Drone — GHOST_RIDER<br>
+          🚗 VIPER-X — 1/10 RC — VIPER_FPV<br>
+          🏗️ IRON-3 — RC Excavator — IRON_CLAW<br>
+          🚗 DUST-R — 1/24 RC — DUST_DEVIL<br>
+          🚗 SPEED-1 — 1/24 Racer — SPEED_DEMON<br>
+          🤖 MECH-X — Transformer — IRON_CLAW<br>
+          🎯 PAINT-1 — Paintball — VIPER_FPV<br>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EVENT MODAL -->
+<div class="modal-overlay" id="event-modal">
+  <div class="modal-box" style="max-width:620px;">
+    <div class="modal-header">
+      <div class="modal-title">🏁 REBOUT EVENTS</div>
+      <button class="modal-close" onclick="closeModal('event-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-tabs">
+        <div class="modal-tab active" onclick="switchTab(this, 'tab-active-event')">ACTIVE</div>
+        <div class="modal-tab" onclick="switchTab(this, 'tab-schedule')">SCHEDULE</div>
+        <div class="modal-tab" onclick="switchTab(this, 'tab-results')">RESULTS</div>
+        <div class="modal-tab" onclick="switchTab(this, 'tab-tickets')">TICKETS</div>
+      </div>
+      <div id="tab-active-event" class="tab-content active">
+        <div class="event-info-box">
+          <div class="event-name">🔴 LIVE — JUNKYARD WARS S01E01</div>
+          <div class="event-detail">
+            📍 Location: Sector 7 Urban Zone<br>
+            ⏱ Duration: 45 minutes<br>
+            👥 Operators: 6 active / 10 max<br>
+            🏆 Prize Pool: $500 + Championship Trophy<br>
+            📡 Streaming: YouTube Live + Twitch<br>
+            🔴 Current Phase: QUALIFYING ROUND 2<br>
+            ⏰ Next Phase: 8 minutes
+          </div>
+        </div>
+        <div class="card-grid">
+          <div class="info-card">
+            <div class="card-icon">🏁</div>
+            <div class="card-title">ENDURANCE COURSE</div>
+            <div class="card-sub">Next: 2 hours<br>Reg open</div>
+          </div>
+          <div class="info-card">
+            <div class="card-icon">🔵</div>
+            <div class="card-title">OVAL TRACK RACE</div>
+            <div class="card-sub">Tomorrow 14:00<br>Reg open</div>
+          </div>
+        </div>
+      </div>
+      <div id="tab-schedule" class="tab-content">
+        <div style="font-family:var(--font-mono); font-size:11px; color:var(--white-dim); line-height:2.2;">
+          🔴 NOW — Junkyard Wars S01E01<br>
+          🟡 +2h — Endurance Course — Open Registration<br>
+          🟢 Tomorrow 10:00 — FPV Drone Racing<br>
+          🟢 Tomorrow 14:00 — Oval Track Grand Prix<br>
+          🟢 Tomorrow 18:00 — Urban Combat Zone<br>
+          🔵 Weekend — Multi-Terrain Championship<br>
+          🔵 Next Week — Mechanized Transformer Battle<br>
+        </div>
+      </div>
+      <div id="tab-results" class="tab-content">
+        <div style="font-family:var(--font-mono); font-size:11px; color:var(--white-dim); line-height:2.2;">
+          🏆 Last Event: FPV Sprint — GHOST_RIDER wins<br>
+          🥈 2nd: VIPER_FPV — 0.4s behind<br>
+          🥉 3rd: IRON_CLAW — RC Excavator class<br>
+          <br>
+          📊 Season Points:<br>
+          1. GHOST_RIDER — 9,840 pts<br>
+          2. VIPER_FPV — 8,210 pts<br>
+          3. IRON_CLAW — 7,650 pts<br>
+        </div>
+      </div>
+      <div id="tab-tickets" class="tab-content">
+        <div class="card-grid">
+          <div class="info-card" onclick="buyTicket('spectator')">
+            <div class="card-icon">👁️</div>
+            <div class="card-title">SPECTATOR</div>
+            <div class="card-sub">$5 / event<br>View only</div>
+          </div>
+          <div class="info-card" onclick="buyTicket('operator')">
+            <div class="card-icon">⚡</div>
+            <div class="card-title">OPERATOR</div>
+            <div class="card-sub">$25 / event<br>Full access</div>
+          </div>
+          <div class="info-card" onclick="buyTicket('vip')">
+            <div class="card-icon">🏆</div>
+            <div class="card-title">VIP PACKAGE</div>
+            <div class="card-sub">$75 / event<br>Pit + cloud access</div>
+          </div>
+          <div class="info-card" onclick="buyTicket('season')">
+            <div class="card-icon">🌐</div>
+            <div class="card-title">SEASON PASS</div>
+            <div class="card-sub">$199 / season<br>All events + pro</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN MODAL -->
+<div class="modal-overlay" id="admin-modal">
+  <div class="modal-box" style="max-width:600px;">
+    <div class="modal-header">
+      <div class="modal-title">⚙️ ADMIN PANEL</div>
+      <button class="modal-close" onclick="closeModal('admin-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-tabs">
+        <div class="modal-tab active" onclick="switchTab(this, 'tab-participants-admin')">PARTICIPANTS</div>
+        <div class="modal-tab" onclick="switchTab(this, 'tab-system')">SYSTEM</div>
+        <div class="modal-tab" onclick="switchTab(this, 'tab-broadcast')">BROADCAST</div>
+      </div>
+      <div id="tab-participants-admin" class="tab-content active">
+        <div style="font-family:var(--font-mono); font-size:11px; margin-bottom:10px; color:var(--white-dim);">
+          CONNECTED PARTICIPANTS — 7/10
+        </div>
+        <div
