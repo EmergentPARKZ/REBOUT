@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FPV OPS COMMAND CENTER</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #0a0a0a;
+  color: #fff;
+  font-family: 'Arial Black', sans-serif;
+  min-height: 100vh;
+}
+header {
+  background: linear-gradient(135deg, #B22222, #1a1a1a, #00008B);
+  padding: 20px;
+  text-align: center;
+  border-bottom: 4px solid #ff0000;
+}
+header h1 {
+  font-size: 2.5em;
+  color: #fff;
+  text-shadow: 0 0 20px #ff4444;
+  letter-spacing: 4px;
+}
+header p {
+  color: #ff6666;
+  font-size: 1em;
+  margin-top: 5px;
+  letter-spacing: 2px;
+}
+.nav-bar {
+  background: #111;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px;
+  flex-wrap: wrap;
+  border-bottom: 2px solid #333;
+}
+.nav-bar a {
+  color: #ff4444;
+  text-decoration: none;
+  padding: 8px 16px;
+  border: 1px solid #ff4444;
+  border-radius: 4px;
+  font-size: 0.85em;
+  letter-spacing: 1px;
+  transition: all 0.3s;
+}
+.nav-bar a:hover {
+  background: #ff4444;
+  color: #fff;
+}
+.hero {
+  text-align: center;
+  padding: 60px 20px;
+  background: radial-gradient(ellipse at center, #1a0000 0%, #0a0a0a 70%);
+}
+.hero h2 {
+  font-size: 2em;
+  color: #ff4444;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+}
+.hero p {
+  color: #aaa;
+  max-width: 700px;
+  margin: 0 auto 30px;
+  line-height: 1.7;
+  font-size: 1.05em;
+}
+.btn-group {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.btn {
+  padding: 14px 28px;
+  border: none;
+  border-radius: 6px;
+  font-size: 1em;
+  font-weight: bold;
+  cursor: pointer;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: transform 0.2s;
+}
+.btn:hover { transform: scale(1.05); }
+.btn-red { background: #cc0000; color: #fff; }
+.btn-blue { background: #00008B; color: #fff; }
+.btn-white { background: #fff; color: #000; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  padding: 40px 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.card {
+  background: #111;
+  border: 1px solid #333;
+  border-radius: 10px;
+  padding: 25px;
+  text-align: center;
+  transition: border-color 0.3s;
+}
+.card:hover { border-color: #ff4444; }
+.card .icon { font-size: 2.5em; margin-bottom: 12px; }
+.card h3 { color: #ff4444; margin-bottom: 10px; font-size: 1.1em; }
+.card p { color: #888; font-size: 0.9em; line-height: 1.6; }
+.status-bar {
+  background: #0d0d0d;
+  border-top: 2px solid #222;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85em;
+  color: #888;
+}
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+.dot-green { background: #00ff00; }
+.dot-yellow { background: #ffff00; }
+.dot-red { background: #ff0000; }
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+.section-title {
+  text-align: center;
+  padding: 30px 20px 10px;
+  font-size: 1.4em;
+  color: #fff;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+.section-title span { color: #ff4444; }
+footer {
+  background: #050505;
+  text-align: center;
+  padding: 30px;
+  color: #444;
+  font-size: 0.85em;
+  border-top: 2px solid #222;
+  margin-top: 40px;
+}
+footer span { color: #ff4444; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🎯 FPV OPS</h1>
+  <p>COMMAND CENTER — LIVE OPERATIONS PLATFORM</p>
+</header>
+
+<nav class="nav-bar">
+  <a href="#">🏠 HOME</a>
+  <a href="#">📡 LIVE FEED</a>
+  <a href="#">🚗 VEHICLES</a>
+  <a href="#">🏁 EVENTS</a>
+  <a href="#">📋 REGISTRY</a>
+  <a href="#">💬 CHAT HUB</a>
+  <a href="#">⚙️ CONTROL</a>
+  <a href="#">🔐 LOGIN</a>
+</nav>
+
+<section class="hero">
+  <h2>🔴 Welcome To The Arena</h2>
+  <p>
+    The world's first integrated FPV Operations Command Platform — combining 
+    live drone feeds, RC vehicle control, heavy equipment coordination, 
+    real-time telemetry, and competitive event management into one global hub.
+  </p>
+  <div class="btn-group">
+    <button class="btn btn-red">🚀 LAUNCH SESSION</button>
+    <button class="btn btn-blue">📡 JOIN LIVE EVENT</button>
+    <button class="btn btn-white">📋 REGISTER NOW</button>
+  </div>
+</section>
+
+<div class="status-bar">
+  <div class="status-item"><div class="dot dot-green"></div> SYSTEM ONLINE</div>
+  <div class="status-item"><div class="dot dot-green"></div> STREAMS ACTIVE: 4</div>
+  <div class="status-item"><div class="dot dot-yellow"></div> OPERATORS: 12</div>
+  <div class="status-item"><div class="dot dot-red"></div> LIVE EVENT: ARENA 3</div>
+</div>
+
+<p class="section-title">⚡ <span>PLATFORM</span> FEATURES</p>
+
+<div class="grid">
+  <div class="card">
+    <div class="icon">📡</div>
+    <h3>LIVE FPV STREAMS</h3>
+    <p>Up to 4 simultaneous analog camera feeds via USB capture, streamed over Wi-Fi with ultra-low latency.</p>
+  </div>
+  <div class="card">
+    <div class="icon">🚗</div>
+    <h3>VEHICLE CONTROL</h3>
+    <p>RC ground vehicles, FPV drones, motorcycles, race cars, and heavy construction equipment coordination.</p>
+  </div>
+  <div class="card">
+    <div class="icon">🏁</div>
+    <h3>COMPETITIVE EVENTS</h3>
+    <p>Endurance courses, oval tracks, urban zones, junkyard obstacle courses, and multi-terrain operations.</p>
+  </div>
+  <div class="card">
+    <div class="icon">💬</div>
+    <h3>COMMAND HUB CHAT</h3>
+    <p>Chat rooms limited to 10 participants per session. Roles: Operator, Camera Provider, Spectator, Judge, Admin.</p>
+  </div>
+  <div class="card">
+    <div class="icon">🛡️</div>
+    <h3>SAFETY PROTOCOLS</h3>
+    <p>Emergency stops, personnel alerts, signal loss detection, and real-time telemetry monitoring built-in.</p>
+  </div>
+  <div class="card">
+    <div class="icon">🌐</div>
+    <h3>GLOBAL ACCESS</h3>
+    <p>Remote coordination through protocol sites. Global participants connect via Wi-Fi command hub processing.</p>
+  </div>
+  <div class="card">
+    <div class="icon">📊</div>
+    <h3>SCORING & JUDGING</h3>
+    <p>Cloud terminals for conferencing, streaming, live scoring, and permissions management per event.</p>
+  </div>
+  <div class="card">
+    <div class="icon">💰</div>
+    <h3>MONETIZATION</h3>
+    <p>Pay-per-session fees, event tickets, ad revenue, sponsor banners, and premium cloud access tiers.</p>
+  </div>
+  <div class="card">
+    <div class="icon">🔧</div>
+    <h3>HARDWARE INTEGRATION</h3>
+    <p>Raspberry Pi 4, ESP32, USB capture devices, Wi-Fi APs, FFmpeg + MediaMTX video pipeline.</p>
+  </div>
+</div>
+
+<footer>
+  <p>© 2025 <span>FPV OPS COMMAND CENTER</span> — EmergentPARKZ Platform</p>
+  <p style="margin-top:8px;">Built for operators. Designed for competition. Engineered for the arena.</p>
+</footer>
+
+</body>
+</html>
